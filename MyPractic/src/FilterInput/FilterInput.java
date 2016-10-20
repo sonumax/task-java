@@ -13,9 +13,11 @@ public class FilterInput {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         String[] containsWord = reader.lines().toArray(String[]::new);
+        String search;
         for (int i = 0; i < args.length; i++){
             int temp = i;
-            containsWord = Arrays.stream(containsWord).filter(s -> s.toLowerCase().contains(args[temp].toLowerCase()) || s.toLowerCase().matches(args[temp].toLowerCase()))
+            search = args[temp].toLowerCase();
+            containsWord = Arrays.stream(containsWord).filter(s -> s.toLowerCase().contains(search) || s.toLowerCase().matches(search))
                     .toArray(String[]::new);
         }
 

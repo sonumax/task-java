@@ -2,6 +2,7 @@ package FilterInput;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 
 public class FilterInput {
     public static void main(String[] args) {
@@ -11,8 +12,13 @@ public class FilterInput {
         }
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        String[] containsWord = reader.lines().filter(s -> s.toLowerCase().contains(args[0].toLowerCase()))
-                .toArray(String[]::new);
+        String[] containsWord = reader.lines().toArray(String[]::new);
+        int temp;
+        for (int i = 0; i < args.length; i++){
+            temp = i;
+            containsWord = Arrays.stream(containsWord).filter(s -> s.toLowerCase().contains(args[temp].toLowerCase()))
+                    .toArray(String[]::new);
+        }
 
         for (String string : containsWord){
             System.out.println(string);

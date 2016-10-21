@@ -6,8 +6,13 @@ import java.util.stream.Stream;
 
 public class SortInput {
     public static void main(String[] args) {
+        //for sorting by argument
+        if(args.length == 0){
+            System.err.println("No argument");
+            return;
+        }
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        sortArg(reader.lines(), args);
+        sortArg(reader.lines(), args[0]);
     }
 
     private static void sortIgnoreCase(Stream<String> stream){
@@ -20,12 +25,10 @@ public class SortInput {
                 .forEach(System.out::println);
     }
 
-    private static void sortArg(Stream<String> stream, String[] args){
-        if(args.length == 0) {
-            System.err.print("No argument");
-            return;
-        }
-        stream.sorted((first, second) -> )
+    private static void sortArg(Stream<String> stream, String number){
+        Integer numberWord = new Integer(number) - 1;
+        stream.sorted((first, second) -> first.split("[\\W]+")[numberWord].compareToIgnoreCase(second.split("[\\W]+")[numberWord]))
                 .forEach(System.out::println);
+
     }
 }

@@ -13,23 +13,15 @@ public class Server {
     public static void main(String[] args) {
         try {
             ServerSocket serverSocket = new ServerSocket(PORT);
-            log.info("Server waiting client");
 
-            Socket client = serverSocket.accept();
-            log.info("Accepted: " + client.getInetAddress());
+            while (true) {
+                log.info("Server waiting client");
+                Socket client = serverSocket.accept();
+                log.info("Accepted: " + client.getInetAddress());
 
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                 PrintWriter out = new PrintWriter(client.getOutputStream())) {
-
-                while (true) {
-                    log.info("Wait answer");
-                    String line = in.readLine();
-                    System.out.println("Client -> " + line);
-
-                    out.println(line);
-                    out.flush();
-                    log.info("Send message to client");
-                }
+                Thread threadClient = new Thread(new ThreadClient(client));
+                threadClient.start();
+                log.fine("Thread: " + threadClient.getName() + " start");
             }
         } catch (IOException e) {
             e.printStackTrace();

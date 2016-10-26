@@ -8,11 +8,16 @@ import java.util.logging.Logger;
 public class Server {
 
     private static final int PORT = 1234;
+    private static ServerSocket serverSocket;
     private static final Logger log = Logger.getLogger(Server.class.getName());
 
     public static void main(String[] args) {
+        startServer(PORT);
+    }
+
+    public static void startServer(int PORT) {
         try {
-            ServerSocket serverSocket = new ServerSocket(PORT);
+            serverSocket = new ServerSocket(PORT);
             log.info("Server open on " + PORT);
 
             while (true) {

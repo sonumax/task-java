@@ -15,7 +15,7 @@ public class Server {
         startServer(PORT);
     }
 
-    public static void startServer(int PORT) {
+    private static void startServer(int PORT) {
         try {
             serverSocket = new ServerSocket(PORT);
             log.info("Server open on " + PORT);

@@ -1,10 +1,8 @@
-package Chat;
+package Chat.Server;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ListenerClient extends Thread {
@@ -13,47 +11,52 @@ public class ListenerClient extends Thread {
 
     private Socket socket;
     private BufferedReader in;
-    private PrintWriter out;
+    private ObjectInputStream ois;
+    private ObjectOutputStream oos;
+    private Message answerClientMessage;
 
     public ListenerClient(Socket client) {
         this.socket = client;
         try {
+            ois = new ObjectInputStream(client.getInputStream());
+            oos = new ObjectOutputStream(client.getOutputStream());
             in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            out = new PrintWriter(client.getOutputStream());
             start();
             log.fine("Thread: " + this.getName() + " start");
         } catch (IOException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, "IOException", e);
         }
     }
 
     @Override
     public void run() {
-        String answer;
         try {
             while (true) {
                 log.fine("Server wait answer");
-                answer = in.readLine();
-                if (answer.equals("null"))
+                answerClientMessage = (Message) ois.readObject();
+                if(answerClientMessage.getMessage().equals("null"))
                     break;
-                Clients.getInstance().sendMessageToAll(answer);
-                System.out.println("Client -> " + answer);
+                Clients.getInstance().sendMessageToAll(answerClientMessage);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (ClassNotFoundException | IOException e) {
+            log.log(Level.SEVERE, "Exception", e);
         } finally {
             try {
                 socket.close();
                 log.info("Socket - " + socket.getInetAddress() + " disconnect");
             } catch (IOException e) {
-                e.printStackTrace();
+                log.log(Level.SEVERE, "IOException", e);
             }
         }
     }
 
-    public void sendMessage(String message) {
-        out.println(message);
-        out.flush();
+    public void sendMessage(Message message) {
+        try {
+            oos.writeObject(message);
+            oos.flush();
+        } catch (IOException e) {
+            log.log(Level.SEVERE, "IOException", e);
+        }
     }
 
     public Socket getSocket() {

@@ -1,4 +1,4 @@
-package Chat;
+package Chat.Server;
 
 import java.net.Socket;
 import java.util.ArrayList;
@@ -7,8 +7,9 @@ import java.util.LinkedList;
 public class Clients {
     private static Clients instance;
     private ArrayList<ListenerClient> listClients;
-    private LinkedList<String> lastMessage;
+    private LinkedList<Message> lastMessage;
     private int limitLastMessage = 10;
+    private int limitClients = 10;
 
     public static Clients getInstance() {
         if(instance == null)
@@ -27,12 +28,17 @@ public class Clients {
         lastMessage.forEach(listenerClient::sendMessage);
     }
 
-    public void sendMessageToAll(String message) {
+    public void sendMessageToAll(Message message) {
         if(lastMessage.size() == limitLastMessage)
             lastMessage.removeFirst();
         lastMessage.addLast(message);
-
         for (ListenerClient listenerClient : listClients)
             listenerClient.sendMessage(message);
+    }
+
+    public boolean checkLimitUser(){
+        if(listClients.size() >=  limitClients)
+            return true;
+        return false;
     }
 }

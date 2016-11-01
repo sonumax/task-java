@@ -1,5 +1,6 @@
 package Chat.Client;
 
+import Chat.Server.Clients;
 import Chat.Server.Message;
 
 import java.io.*;
@@ -35,9 +36,9 @@ public class Client {
 
                 entryName(oos, readConsole);
 
-                new Thread(new ReadMessage(in)).start();
+                new Thread(new ReadMessage(client, in)).start();
 
-                while (true) {
+                while (client.isConnected()) {
                     readLine = readConsole.readLine();
                     message = new Message(readLine, new Date(), nameClient, client.getInetAddress());
                     oos.writeObject(message);
@@ -63,7 +64,7 @@ public class Client {
         System.out.print("Your name: ");
         nameClient = readConsole.readLine();
         System.out.println("Welcome " + nameClient);
-        Message name = new Message("Join", new Date(), nameClient, client.getInetAddress());
+        Message name = new Message("join", new Date(), nameClient, client.getInetAddress());
         oos.writeObject(name);
         oos.flush();
     }

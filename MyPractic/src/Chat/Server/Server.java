@@ -1,12 +1,16 @@
 package Chat.Server;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Server {
+public final class Server {
 
     private static final int PORT = 1234;
     private static ServerSocket serverSocket;
@@ -24,9 +28,11 @@ public class Server {
 
             while (true) {
                 log.info("Server waiting client");
-                if(Clients.getInstance().checkLimitUser())
-                    return;
                 client = serverSocket.accept();
+                if (Clients.getInstance().checkLimitUser()) {
+                    client.close();
+                    continue;
+                }
                 log.info("Accepted: " + client.getInetAddress());
                 Clients.getInstance().addClient(client);
                 log.fine("Add client - " + client.getInetAddress());

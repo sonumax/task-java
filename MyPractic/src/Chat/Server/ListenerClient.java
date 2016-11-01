@@ -1,6 +1,8 @@
 package Chat.Server;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -10,7 +12,6 @@ public class ListenerClient extends Thread {
     private static final Logger log = Logger.getLogger(Server.class.getName());
 
     private Socket socket;
-    private BufferedReader in;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
     private Message answerClientMessage;
@@ -20,7 +21,6 @@ public class ListenerClient extends Thread {
         try {
             ois = new ObjectInputStream(client.getInputStream());
             oos = new ObjectOutputStream(client.getOutputStream());
-            in = new BufferedReader(new InputStreamReader(client.getInputStream()));
             start();
             log.fine("Thread: " + this.getName() + " start");
         } catch (IOException e) {
@@ -31,17 +31,19 @@ public class ListenerClient extends Thread {
     @Override
     public void run() {
         try {
-            while (true) {
+            while (socket.isConnected()) {
                 log.fine("Server wait answer");
                 answerClientMessage = (Message) ois.readObject();
-                if(answerClientMessage.getMessage().equals("null"))
+                if(answerClientMessage.getMessage().equals("null")) {
                     break;
+                }
                 Clients.getInstance().sendMessageToAll(answerClientMessage);
             }
         } catch (ClassNotFoundException | IOException e) {
             log.log(Level.SEVERE, "Exception", e);
         } finally {
             try {
+                Clients.getInstance().removeClient(socket);
                 socket.close();
                 log.info("Socket - " + socket.getInetAddress() + " disconnect");
             } catch (IOException e) {
@@ -62,4 +64,5 @@ public class ListenerClient extends Thread {
     public Socket getSocket() {
         return socket;
     }
+
 }

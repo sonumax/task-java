@@ -57,10 +57,10 @@ public class Client extends Thread{
                  FileInputStream fileInputStream = new FileInputStream(PATH_TO_PASSWORDS);
                  FileOutputStream fileOutputStream = new FileOutputStream(PATH_TO_PASSWORDS, true)) {
 
+                Clients.getInstance().addListClient(this);
+
                 passwordsProp = new Properties();
                 passwordsProp.load(fileInputStream);
-
-                Clients.getInstance().addListClient(this);
 
                 Thread readMessage = new Thread(new ReadMessage(client, in));
 
@@ -114,7 +114,7 @@ public class Client extends Thread{
             System.out.print("Write new password: ");
             passwordClient = readConsole.readLine();
             PrintStream pw = new PrintStream(fileOutputStream, true);
-            pw.append(nameClient + " = " + passwordClient);
+            pw.append(nameClient + " = " + passwordClient + "\n");
             pw.flush();
             return true;
         }

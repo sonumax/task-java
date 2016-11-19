@@ -37,6 +37,7 @@ public class Clients {
     private Clients() {
         listListenerClient = new ArrayList<>();
         lastMessage = new LinkedList<>();
+        listClient = new ArrayList<>();
 
         try {
             DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -60,7 +61,7 @@ public class Clients {
     }
 
     public synchronized void addListClient(Client client) {
-        if(listListenerClient.size() >=  limitClients) {
+        if(listClient.size() >=  limitClients) {
             return;
         }
         listClient.add(client);

@@ -3,13 +3,7 @@ package Chat.Client;
 import Chat.Server.Clients;
 import Chat.Server.Message;
 import Chat.WorkWithXml;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -22,9 +16,8 @@ public class Client extends Thread{
 
     private static final Logger log = Logger.getLogger(Client.class.getName());
     public static final String PATH_TO_PASSWORDS = "src/Chat/Resources/passwords.properties";
-    private static final String PATH_TO_XML = "./src/Chat/Resources/properties.xml";
-    private static  String IP;
-    private static int PORT;
+    private static  final String IP = WorkWithXml.getInstance().searchInXml("//Properties/IP");
+    private static final int PORT = Integer.parseInt(WorkWithXml.getInstance().searchInXml("//Properties/Port"));;
 
     private String nameClient;
     private String passwordClient;
@@ -33,16 +26,6 @@ public class Client extends Thread{
     private Properties passwordsProp;
 
     public static void main(String[] args) {
-        try {
-            DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document document = documentBuilder.parse(PATH_TO_XML);
-
-            IP = WorkWithXml.searchInXml(document, "//Properties/IP");
-            PORT = Integer.parseInt(WorkWithXml.searchInXml(document, "//Properties/Port"));
-
-        } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
-            e.printStackTrace();
-        }
         new Client().startClient(IP, PORT);
     }
 

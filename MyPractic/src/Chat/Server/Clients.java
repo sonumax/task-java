@@ -2,26 +2,18 @@ package Chat.Server;
 
 import Chat.Client.Client;
 import Chat.WorkWithXml;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Clients {
-    private static final String PATH_TO_XML = "./src/Chat/Resources/properties.xml";
+    private final int limitLastMessage = Integer.parseInt(WorkWithXml.getInstance().searchInXml("//Properties/LimitLastMessage"));
+    private final int limitClients = Integer.parseInt(WorkWithXml.getInstance().searchInXml("//Properties/LimitClients"));
     private static volatile Clients instance;
     private ArrayList<ListenerClient> listListenerClient;
     private ArrayList<Client> listClient;
     private LinkedList<Message> lastMessage;
-    private int limitLastMessage;
-    private int limitClients;
 
     public static Clients getInstance() {
         if(instance == null) {
@@ -38,16 +30,6 @@ public class Clients {
         listListenerClient = new ArrayList<>();
         lastMessage = new LinkedList<>();
         listClient = new ArrayList<>();
-
-        try {
-            DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document document = documentBuilder.parse(PATH_TO_XML);
-
-            limitLastMessage = Integer.parseInt(WorkWithXml.searchInXml(document, "//Properties/LimitLastMessage"));
-            limitClients = Integer.parseInt(WorkWithXml.searchInXml(document, "//Properties/LimitClients"));
-        } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
-            e.printStackTrace();
-        }
     }
 
     public synchronized boolean addListenerClient(Socket client) {

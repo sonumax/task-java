@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Properties>
+    <Port>1235</Port>
+    <IP>localhost</IP>
+    <LimitLastMessage>10</LimitLastMessage>
+    <LimitClients>3</LimitClients>
+</Properties>

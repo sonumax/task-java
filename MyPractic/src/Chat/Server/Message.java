@@ -32,6 +32,4 @@ public class Message implements Serializable{
     public InetAddress getIP() {
         return IP;
     }
-
-
 }

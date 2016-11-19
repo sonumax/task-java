@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-class ReadMessage implements Runnable {
+class ReadMessage extends Thread{
 
     private static final Logger log = Logger.getLogger(Client.class.getName());
 
@@ -25,7 +25,7 @@ class ReadMessage implements Runnable {
     @Override
     public void run() {
         try {
-            while (client.isConnected()) {
+            while (!this.isInterrupted()) {
                 log.fine("Client wait answer");
                 answerMessage = (Message) ois.readObject();
                 if (answerMessage.getMessage().equals("null")) {

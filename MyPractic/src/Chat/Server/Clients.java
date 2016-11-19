@@ -1,15 +1,27 @@
 package Chat.Server;
 
+import Chat.Client.Client;
+import Chat.WorkWithXml;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Clients {
+    private static final String PATH_TO_XML = "./src/Chat/Resources/properties.xml";
     private static volatile Clients instance;
-    private ArrayList<ListenerClient> listClients;
+    private ArrayList<ListenerClient> listListenerClient;
+    private ArrayList<Client> listClient;
     private LinkedList<Message> lastMessage;
-    private int limitLastMessage = 10;
-    private int limitClients = 2;
+    private int limitLastMessage;
+    private int limitClients;
 
     public static Clients getInstance() {
         if(instance == null) {
@@ -23,14 +35,35 @@ public class Clients {
     }
 
     private Clients() {
-        listClients = new ArrayList<>();
+        listListenerClient = new ArrayList<>();
         lastMessage = new LinkedList<>();
+
+        try {
+            DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document document = documentBuilder.parse(PATH_TO_XML);
+
+            limitLastMessage = Integer.parseInt(WorkWithXml.searchInXml(document, "//Properties/LimitLastMessage"));
+            limitClients = Integer.parseInt(WorkWithXml.searchInXml(document, "//Properties/LimitClients"));
+        } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
+            e.printStackTrace();
+        }
     }
 
-    public synchronized void addClient(Socket client) {
+    public synchronized boolean addListenerClient(Socket client) {
+        if(listListenerClient.size() >=  limitClients) {
+            return false;
+        }
         ListenerClient listenerClient = new ListenerClient(client);
-        listClients.add(listenerClient);
+        listListenerClient.add(listenerClient);
         lastMessage.forEach(listenerClient::sendMessage);
+        return true;
+    }
+
+    public synchronized void addListClient(Client client) {
+        if(listListenerClient.size() >=  limitClients) {
+            return;
+        }
+        listClient.add(client);
     }
 
     public synchronized void sendMessageToAll(Message message) {
@@ -38,23 +71,21 @@ public class Clients {
             lastMessage.removeFirst();
         }
         lastMessage.addLast(message);
-        for (ListenerClient listenerClient : listClients) {
+        for (ListenerClient listenerClient : listListenerClient) {
             listenerClient.sendMessage(message);
         }
     }
 
-    public synchronized boolean checkLimitUser(){
-        if(listClients.size() >=  limitClients) {
-            return true;
-        }
-        return false;
-    }
-
     public synchronized void removeClient(Socket client) {
-        for (int i = 0; i < listClients.size(); i++) {
-            if(listClients.get(i).getSocket().equals(client)) {
-                listClients.remove(i);
+        for (int i = 0; i < listListenerClient.size(); i++) {
+            if(listListenerClient.get(i).getSocket().equals(client)) {
+                listListenerClient.remove(i);
             }
         }
+    }
+
+    public synchronized void interruptAllClient() {
+        listListenerClient.forEach(Thread::interrupt);
+        listClient.forEach(Thread::interrupt);
     }
 }

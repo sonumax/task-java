@@ -31,7 +31,7 @@ public class ListenerClient extends Thread {
     @Override
     public void run() {
         try {
-            while (socket.isConnected()) {
+            while (!isInterrupted()) {
                 log.fine("Server wait answer");
                 answerClientMessage = (Message) ois.readObject();
                 if(answerClientMessage.getMessage().equals("null")) {
@@ -64,5 +64,4 @@ public class ListenerClient extends Thread {
     public Socket getSocket() {
         return socket;
     }
-
 }
